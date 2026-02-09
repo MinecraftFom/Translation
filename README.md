@@ -5,7 +5,7 @@ A plugin which fixes the problem that the original Bukkit api cannot localize la
 **IMPORTANT NOTICE**
 
 
-Requires dependency 'SpigotASM' for collection @Translatable annotation data
+Requires dependency 'SpigotASM' for collecting @Translatable annotation data
 
 
 **USAGES**
