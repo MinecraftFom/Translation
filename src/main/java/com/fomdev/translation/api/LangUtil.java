@@ -1,6 +1,7 @@
 package com.fomdev.translation.api;
 
 import com.fomdev.sasm.api.PluginClassUtil;
+import com.fomdev.translation.event.TranslationEvent;
 import org.bukkit.Bukkit;
 
 import java.lang.reflect.InvocationTargetException;
@@ -84,7 +85,9 @@ public class LangUtil {
     }
 
     public static void setLanguage(String lang) {
+        String original = current;
         current = lang;
+        Bukkit.getPluginManager().callEvent(new TranslationEvent(original, lang));
     }
 
     public static String getCurrentLanguage() {
