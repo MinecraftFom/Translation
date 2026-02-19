@@ -118,11 +118,13 @@ public class LangUtil {
                         }
 
                         dictionary.get(lang).putAll(dict);
-
+                        Bukkit.getLogger().info("Registered a language file of language @0 at @1"
+                                .replace("@0", lang)
+                                .replace("@1", f.getName())
+                        );
                     }
                 } else {
                     Bukkit.getLogger().warning("Caught an invalid unrecognizable file in language path");
-                    continue;
                 }
             }
         } catch (IOException e) {
