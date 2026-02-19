@@ -1,5 +1,6 @@
 package com.fomdev.translation.api;
 
+import com.fomdev.dbs.api.YamlFileCache;
 import com.fomdev.sasm.api.PluginClassUtil;
 import com.fomdev.translation.event.TranslationEvent;
 import org.bukkit.Bukkit;
@@ -69,9 +70,15 @@ public class LangUtil {
         return dictionary.containsKey(lang);
     }
 
+    public static void initLanguage() {
+        YamlFileCache cache = new YamlFileCache(".", "lang");
+        current = cache.get("lang") == null? "en_us": (String) cache.get("lang");
+    }
+
     public static void setLanguage(String lang) {
         String original = current;
         current = lang;
+        saveLanguage();
         Bukkit.getPluginManager().callEvent(new TranslationEvent(original, lang));
     }
 
@@ -93,6 +100,13 @@ public class LangUtil {
         String lang = provider.getClass().getAnnotation(Translatable.class).lang() == null? "en_us": provider.getClass().getAnnotation(Translatable.class).lang();
         applyDictionary(provider, lang);
     }
+
+    private static void saveLanguage() {
+        YamlFileCache cache = new YamlFileCache(".", "lang");
+        cache.append("lang", current);
+        cache.write();
+    }
+
     static {
         dictionary = new HashMap<>();
     }

@@ -11,6 +11,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public final class Translation extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
+        LangUtil.initLanguage();
         assert getCommand("language") != null;
         getCommand("language").setExecutor(new CommandLanguage.LanguageCommand());
         getCommand("language").setTabCompleter(new CommandLanguage.LanguageCompletion());
