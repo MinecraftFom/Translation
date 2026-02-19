@@ -80,6 +80,7 @@ public class LangUtil {
     public static void initLanguage() {
         YamlFileCache cache = new YamlFileCache(".", "lang");
         current = cache.get("lang") == null? "en_us": (String) cache.get("lang");
+        saveLanguage();
     }
 
     public static void setLanguage(String lang) {
