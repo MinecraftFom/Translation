@@ -30,6 +30,7 @@ public class CommandLanguage {
                         PluginClassUtil.rescanCache();
 
                         try {
+                            LangUtil.syncDictionaryFromFolder();
                             LangUtil.syncDictionaryFromPackages();
                         } catch (Exception ignored) {
 

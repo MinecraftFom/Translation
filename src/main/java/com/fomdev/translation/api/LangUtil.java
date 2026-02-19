@@ -1,16 +1,23 @@
 package com.fomdev.translation.api;
 
+import com.fomdev.dbs.api.JsonFileCache;
 import com.fomdev.dbs.api.YamlFileCache;
 import com.fomdev.sasm.api.PluginClassUtil;
 import com.fomdev.translation.event.TranslationEvent;
 import org.bukkit.Bukkit;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 public class LangUtil {
     private static String current;
@@ -80,6 +87,47 @@ public class LangUtil {
         current = lang;
         saveLanguage();
         Bukkit.getPluginManager().callEvent(new TranslationEvent(original, lang));
+    }
+
+    public static void syncDictionaryFromFolder() {
+        try (Stream<Path> paths = Files.walk(Paths.get(".", "languages"))) {
+            List<File> files = paths.map(Path::toUri).map(File::new).toList();
+            for (File f : files) {
+                if (f.isDirectory()) {
+                    for (File l: Files.walk(Paths.get(f.getAbsolutePath())).filter(Files::isRegularFile).map(Path::toUri).map(File::new).toList()) {
+                        if (!l.getName().endsWith(".json")) {
+                            Bukkit.getLogger().warning("Caught an invalid unrecognizable file in language pack");
+                        }
+
+                        JsonFileCache cache = new JsonFileCache(l.getParent(), l.getName());
+                        Object lo;
+
+                        if ((lo = cache.get("lang")) == null) {
+                            Bukkit.getLogger().warning("Caught an broken or invalid file in language pack");
+                        }
+
+                        String lang = (String) lo;
+
+                        if (!hasLanguage(lang)) {
+                            dictionary.put(lang, new HashMap<>());
+                        }
+
+                        Map<String, String> dict = new HashMap<>();
+                        for (String k: cache.get().keySet()) {
+                            dict.put(k, (String) dict.get(k));
+                        }
+
+                        dictionary.get(lang).putAll(dict);
+
+                    }
+                } else {
+                    Bukkit.getLogger().warning("Caught an invalid unrecognizable file in language path");
+                    continue;
+                }
+            }
+        } catch (IOException e) {
+            Bukkit.getLogger().log(Level.WARNING, e.getMessage() + e.getCause());
+        }
     }
 
     public static void syncDictionaryFromPackages() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
