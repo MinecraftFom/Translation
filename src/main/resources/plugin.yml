@@ -1,0 +1,14 @@
+name: Translation
+version: '1.0.1'
+main: com.fomdev.translation.init.Translation
+api-version: '1.21'
+prefix: Langutil
+authors: [ Fomdev ]
+load: POSTWORLD
+description: A plugin for in-game plugin translation. (Fixes the phenomenom that spigot plugins cannot use the Minecraft translation)
+commands:
+  language:
+    usage: /language [disable | enable | reload | switch] <language>
+depend:
+  - DataStorager
+  - SpigotASM
