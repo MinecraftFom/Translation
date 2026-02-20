@@ -91,19 +91,30 @@ public class LangUtil {
     }
 
     public static void syncDictionaryFromFolder() {
-        try (Stream<Path> paths = Files.walk(Paths.get(".", "languages"))) {
-            List<File> files = paths.map(Path::toUri).map(File::new).toList();
+        Path languages = Paths.get("languages");
+
+        if (!Files.exists(languages)) {
+            try {
+                Files.createDirectory(languages);
+            } catch (IOException e) {
+                Bukkit.getLogger().log(Level.WARNING, e.getMessage() + e.getCause());
+            }
+        }
+
+        try {
+            File[] files = new File(languages.toUri()).listFiles();
             for (File f : files) {
                 if (f.isDirectory()) {
-                    for (File l: Files.walk(Paths.get(f.getAbsolutePath())).filter(Files::isRegularFile).map(Path::toUri).map(File::new).toList()) {
+                    File[] langs = f.listFiles();
+                    for (File l: langs) {
                         if (!l.getName().endsWith(".json")) {
                             Bukkit.getLogger().warning("Caught an invalid unrecognizable file in language pack");
                         }
 
-                        JsonFileCache cache = new JsonFileCache(l.getParent(), l.getName());
-                        Object lo;
+                        JsonFileCache cache = new JsonFileCache(l);
+                        Object lo = cache.get("lang");
 
-                        if ((lo = cache.get("lang")) == null) {
+                        if (lo == null) {
                             Bukkit.getLogger().warning("Caught an broken or invalid file in language pack");
                         }
 
@@ -115,7 +126,7 @@ public class LangUtil {
 
                         Map<String, String> dict = new HashMap<>();
                         for (String k: cache.get().keySet()) {
-                            dict.put(k, (String) dict.get(k));
+                            dict.put(k, dict.get(k));
                         }
 
                         dictionary.get(lang).putAll(dict);
@@ -128,7 +139,7 @@ public class LangUtil {
                     Bukkit.getLogger().warning("Caught an invalid unrecognizable file in language path");
                 }
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             Bukkit.getLogger().log(Level.WARNING, e.getMessage() + e.getCause());
         }
     }

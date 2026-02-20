@@ -27,8 +27,8 @@ public final class Translation extends JavaPlugin implements Listener {
     public void onServerStart(ServerLoadEvent event) {
         try {
             PluginClassUtil.rescanCache();
-            LangUtil.syncDictionaryFromFolder();
             LangUtil.syncDictionaryFromPackages();
+            LangUtil.syncDictionaryFromFolder();
         } catch (Exception ignored) {
 
         }
